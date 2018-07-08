@@ -4,5 +4,8 @@
   ],
   "rules": {
     "only-import-from-index": true
+  },
+  "jsRules": {
+    "only-import-from-index": true
   }
 }
