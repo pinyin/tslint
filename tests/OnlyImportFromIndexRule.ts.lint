@@ -1,10 +1,10 @@
-import {b} from './b'
-import {d} from './b/c/d'
-~~~~~~~~~~~~~~~~~~~~~~~~~     [index-in-b]
+import {b} from './ts'
+import {d} from './ts/c/d'
+~~~~~~~~~~~~~~~~~~~~~~~~~~     [check-ts]
 
 
 import {p} from './js/private'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  [check-js]
 
-[index-in-b]: Directory './b' has index file. Please import from './b' instead.
+[check-ts]: Directory './ts/c' has index file. Please import from './ts/c' instead.
 [check-js]: Directory './js' has index file. Please import from './js' instead.
