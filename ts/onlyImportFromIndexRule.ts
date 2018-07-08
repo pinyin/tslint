@@ -78,6 +78,7 @@ function getAncestorsUntil(of: string, until: string): Array<string> {
     return result
 }
 
-function errorMessage(path: string): string {
-    return `Directory '${path}' has index file. Please require from '${path}' instead.`
+function errorMessage(dir: string): string {
+    const module = path.normalize(dir)
+    return `Directory './${module}' has index file. Please require from './${module}' instead.`
 }
