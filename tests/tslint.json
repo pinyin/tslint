@@ -1,0 +1,8 @@
+{
+  "rulesDirectory": [
+    "../js"
+  ],
+  "rules": {
+    "only-require-from-index": true
+  }
+}

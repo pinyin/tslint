@@ -1,0 +1,6 @@
+import {b} from './b'
+import {d} from './b/c/d'
+~~~~~~~~~~~~~~~~~~~~~~~~~     [index-in-b]
+
+
+[index-in-b]: Directory './b' has index file. Please require from './b' instead.

@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "outDir": "js",
+    "target": "es5",
+    "module": "commonjs",
+    "jsx": "react",
+    "esModuleInterop": true,
+    "inlineSourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "strict": true,
+    "declarationDir": "js",
+    "importHelpers": true,
+    "downlevelIteration": true,
+    "noErrorTruncation": true,
+    "lib": [
+      "es6",
+      "es2016.array.include"
+    ]
+  },
+  "include": [
+    "ts"
+  ]
+}
