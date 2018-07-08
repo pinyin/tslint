@@ -77,4 +77,4 @@ out.ts:
 
 `out.ts` can only import from `./src`, any other import into `src` will be reported as Error.
 
-
+Only imports with relevant path will be checked.

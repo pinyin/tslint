@@ -41,6 +41,9 @@ class Walker extends ProgramAwareRuleWalker {
 
         const fromPath = path.normalize(node.parent.fileName)
         const moduleLiteral = node.moduleSpecifier.text
+        if (!moduleLiteral.startsWith('.')) {
+            return
+        }
         const moduleResolved = ts.resolveModuleName(moduleLiteral, fromPath, compilerOptions, ts.sys)
         if (!moduleResolved || !moduleResolved.resolvedModule) {
             return
