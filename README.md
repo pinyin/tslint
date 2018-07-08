@@ -75,6 +75,6 @@ out.ts:
     import {a} from './src/public.ts' // error
 ```
 
-`out.ts` can only import from `./src`, any import into `src` will be reported as Error will be reported as Error.
+`out.ts` can only import from `./src`, any import into `src` will be reported as Error.
 
 
