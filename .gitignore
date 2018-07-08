@@ -162,11 +162,10 @@ Temporary Items
 
 .awcache
 .cache-loader
-js/**/*
-src/**/*.js
+/js/**/*
+/src/**/*.js
 
 .vscode
 .cache
 /report.html
 
-*.js
