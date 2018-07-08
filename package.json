@@ -11,7 +11,7 @@
   "sideEffects": false,
   "scripts": {
     "prepublishOnly": "rm -rf dist && npx tsc",
-    "test": "echo npx tsc && echo npx tslint --test tests"
+    "test": "npx tsc && npx tslint --test tests"
   },
   "repository": {
     "type": "git",
