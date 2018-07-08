@@ -46,7 +46,7 @@ Edit `tslint.json` to include:
 }
 ```
 
-If you are not using TSLint, create a file named tsconfig.json at the root of your project.
+If you are not using TSLint, create a file named tslint.json at the root of your project.
 
 [Enable TypeScript in your IDE](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support). You should be able to write JavaScript/TypeScript like before, with some additional checks.
 
