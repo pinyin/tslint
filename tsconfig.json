@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
     "outDir": "js",
-    "target": "es2015",
+    "target": "es5",
     "module": "commonjs",
     "jsx": "react",
     "esModuleInterop": true,
     "inlineSourceMap": true,
     "declaration": true,
     "declarationMap": true,
-    "strict": true,
     "declarationDir": "js",
+    "strict": true,
+    "importHelpers": true,
+    "noEmitHelpers": true,
     "downlevelIteration": true,
     "noErrorTruncation": true,
     "lib": [

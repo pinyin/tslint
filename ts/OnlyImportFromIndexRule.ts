@@ -1,10 +1,10 @@
 import * as path from 'path'
-import * as tsLint from 'tslint'
+import {IRuleMetadata, ProgramAwareRuleWalker, RuleFailure, Rules} from 'tslint'
 import * as ts from 'typescript'
 
-export class OnlyRequireFromIndexRule extends tsLint.Rules.TypedRule {
-    static metadata: tsLint.IRuleMetadata = {
-        ruleName: 'only-require-from-index',
+export class OnlyImportFromIndexRule extends Rules.TypedRule {
+    static metadata: IRuleMetadata = {
+        ruleName: 'only-import-from-index',
         type: 'style',
         description: 'When a directory contains an file named index (e.g. index.ts, index.js), files outside of the directory can no longer import other files in the directory except the index. Only import statements are checked at this moment.',
         options: null,
@@ -12,15 +12,15 @@ export class OnlyRequireFromIndexRule extends tsLint.Rules.TypedRule {
         typescriptOnly: false,
     }
 
-    applyWithProgram(sourceFile: ts.SourceFile, program: ts.Program): tsLint.RuleFailure[] {
+    applyWithProgram(sourceFile: ts.SourceFile, program: ts.Program): RuleFailure[] {
         const walker = new Walker(sourceFile, this.getOptions(), program)
         return this.applyWithWalker(walker)
     }
 }
 
-export const Rule = OnlyRequireFromIndexRule // For naming conversion
+export const Rule = OnlyImportFromIndexRule // For naming conversion
 
-class Walker extends tsLint.ProgramAwareRuleWalker {
+class Walker extends ProgramAwareRuleWalker {
     protected visitSourceFile(node: ts.SourceFile): void {
         node.statements
             .filter(statement => ts.isImportDeclaration(statement))
@@ -48,10 +48,10 @@ class Walker extends tsLint.ProgramAwareRuleWalker {
         const targetPath = path.normalize(moduleResolved.resolvedModule.resolvedFileName)
 
         const fromAncestors = getAncestorsUntil(fromPath, baseDIR)
-        const targetAncestors = getAncestorsUntil(targetPath, baseDIR)
+        const targetAncestors = getAncestorsUntil(targetPath, baseDIR).reverse()
         for (const targetAncestor of targetAncestors) {
             if (fromAncestors.includes(targetAncestor)) {
-                break
+                continue
             }
             const potentialIndexedModule = `./${path.relative(path.dirname(fromPath), targetAncestor)}` // TODO
             const resolvedIndex = ts.resolveModuleName(potentialIndexedModule, fromPath, compilerOptions, ts.sys)
@@ -59,10 +59,10 @@ class Walker extends tsLint.ProgramAwareRuleWalker {
                 continue
             }
             const indexPath = path.normalize(resolvedIndex.resolvedModule.resolvedFileName)
-            if (indexPath === targetPath) {
-                break // already importing from index
+            if (indexPath !== targetPath) {
+                this.addFailureAtNode(node, errorMessage(potentialIndexedModule))
+                break
             }
-            this.addFailureAtNode(node, errorMessage(potentialIndexedModule))
         }
     }
 }

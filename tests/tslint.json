@@ -3,6 +3,6 @@
     "../js"
   ],
   "rules": {
-    "only-require-from-index": true
+    "only-import-from-index": true
   }
 }
