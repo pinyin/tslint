@@ -30,7 +30,7 @@ Then, edit `tsconfig.json` to include:
 }
 ```
 
-If you are not using TypeScript, create a file named tsconfig.json at the root of your project.
+If you are not using TypeScript, create a `tsconfig.json` file at the root of your project.
 
 Edit `tslint.json` to include:
 
@@ -46,7 +46,7 @@ Edit `tslint.json` to include:
 }
 ```
 
-If you are not using TSLint, create a file named tslint.json at the root of your project.
+If you are not using TSLint, create a `tslint.json` file at the root of your project.
 
 [Enable TypeScript in your IDE](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support). You should be able to write JavaScript/TypeScript like before, with some additional checks.
 
@@ -56,9 +56,9 @@ TSLint would start with TypeScript Language Service, so there's no need to enabl
 
 ### only-import-from-index
 
-If a directory contains a index.js/index.ts file, files outside of the directory can only import from index.js/index.ts file. No import can "pass through" the index file.
+If a directory contains an index.js/index.ts file, files outside of the directory can only import from index.js/index.ts file. No import can "pass through" the index file.
 
-For example, give the following file structure: 
+For example, given the following file structure: 
 
 ```
 src/
@@ -75,6 +75,6 @@ out.ts:
     import {a} from './src/public.ts' // error
 ```
 
-`out.ts` can only import from `./src`, any import into `src` will be reported as Error.
+`out.ts` can only import from `./src`, any other import into `src` will be reported as Error.
 
 
