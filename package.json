@@ -18,7 +18,6 @@
     "url": "git+https://github.com/pinyin/tslint.git"
   },
   "keywords": [
-    "react",
     "tslint"
   ],
   "author": "Bo Bao <bob432091@gmail.com> (https://github.com/pinyin)",
