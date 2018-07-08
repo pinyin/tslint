@@ -6,5 +6,5 @@ import {d} from './b/c/d'
 import {p} from './js/private'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  [check-js]
 
-[index-in-b]: Directory './b' has index file. Please require from './b' instead.
-[check-js]: Directory './js' has index file. Please require from './js' instead.
+[index-in-b]: Directory './b' has index file. Please import from './b' instead.
+[check-js]: Directory './js' has index file. Please import from './js' instead.
