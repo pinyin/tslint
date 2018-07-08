@@ -65,7 +65,7 @@ src/
     index.ts(content):
         export {a} from './public'
     public.ts:
-        import {b} from './private'
+        import {b} from './private' // ok
         export const a = b
     private.ts:
         export const b = 'b'
