@@ -29,8 +29,7 @@
   "homepage": "https://github.com/pinyin/tslint#readme",
   "devDependencies": {
     "tslint": "^5.10.0",
-    "typescript": "^2.9.2",
-    "tslib": "^1.9.3"
+    "typescript": "^2.9.2"
   },
   "peerDependencies": {
     "tslint": "^5.10.0",
