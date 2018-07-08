@@ -10,7 +10,6 @@
     "declarationMap": true,
     "strict": true,
     "declarationDir": "js",
-    "importHelpers": true,
     "downlevelIteration": true,
     "noErrorTruncation": true,
     "lib": [
