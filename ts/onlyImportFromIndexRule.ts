@@ -56,7 +56,9 @@ class Walker extends ProgramAwareRuleWalker {
             if (fromAncestors.includes(targetAncestor)) {
                 continue
             }
-            const potentialIndexedModule = `./${path.relative(path.dirname(fromPath), targetAncestor)}` // TODO
+            const relativePath = path.relative(path.dirname(fromPath), targetAncestor)
+            const prefix = relativePath.startsWith('.') ? '' : './'
+            const potentialIndexedModule = `${prefix}${relativePath}` // TODO
             const resolvedIndex = ts.resolveModuleName(potentialIndexedModule, fromPath, compilerOptions, ts.sys)
             if (!resolvedIndex || !resolvedIndex.resolvedModule) {
                 continue
@@ -64,6 +66,7 @@ class Walker extends ProgramAwareRuleWalker {
             const indexPath = path.normalize(resolvedIndex.resolvedModule.resolvedFileName)
             if (indexPath !== targetPath) {
                 this.addFailureAtNode(node, errorMessage(potentialIndexedModule))
+                // TODO add fix
                 break
             }
         }
@@ -82,6 +85,6 @@ function getAncestorsUntil(of: string, until: string): Array<string> {
 }
 
 function errorMessage(dir: string): string {
-    const module = path.normalize(dir).replace('\\', '/')
-    return `Directory './${module}' has index file. Please import from './${module}' instead.`
+    const module = dir.replace('\\', '/')
+    return `Directory '${module}' has index file. Please import from '${module}' instead.`
 }
