@@ -51,7 +51,7 @@ class Walker extends ProgramAwareRuleWalker {
         const targetPath = path.normalize(moduleResolved.resolvedModule.resolvedFileName)
 
         const fromAncestors = getAncestorsUntil(fromPath, baseDIR)
-        const targetAncestors = getAncestorsUntil(targetPath, baseDIR).reverse()
+        const targetAncestors = getAncestorsUntil(targetPath, baseDIR)
         for (const targetAncestor of targetAncestors) {
             if (fromAncestors.includes(targetAncestor)) {
                 continue
@@ -81,7 +81,7 @@ function getAncestorsUntil(of: string, until: string): Array<string> {
     ) {
         result.push(current)
     }
-    return result
+    return result.reverse()
 }
 
 function errorMessage(dir: string): string {
