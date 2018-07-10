@@ -2,9 +2,16 @@ import {b} from './ts'
 import {d} from './ts/c/d'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~     [check-ts]
 
+export {b} from './ts'
+export {d} from './ts/c/d'
+~~~~~~~~~~~~~~~~~~~~~~~~~~     [check-ts]
+
 
 import {p} from './js/private'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  [check-js]
+export {p} from './js/private'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  [check-js]
 
 [check-ts]: Directory './ts' has index file. Please import from './ts' instead.
 [check-js]: Directory './js' has index file. Please import from './js' instead.
+
