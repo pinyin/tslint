@@ -35,6 +35,7 @@
     "typescript": "^2.9.2"
   },
   "dependencies": {
+    "@pinyin/maybe": "0.0.9",
     "@types/node": "^10.5.2",
     "tslib": "^1.9.3"
   },

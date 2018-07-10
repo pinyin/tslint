@@ -1,9 +1,10 @@
+import {assume, existing, Maybe, notExisting} from '@pinyin/maybe'
 import * as path from 'path'
-import {IRuleMetadata, ProgramAwareRuleWalker, RuleFailure, Rules} from 'tslint'
+import * as tslint from 'tslint'
 import * as ts from 'typescript'
 
-export class OnlyImportFromIndexRule extends Rules.TypedRule {
-    static metadata: IRuleMetadata = {
+export class OnlyImportFromIndexRule extends tslint.Rules.TypedRule {
+    static metadata: tslint.IRuleMetadata = {
         ruleName: 'only-import-from-index',
         type: 'style',
         description: 'When a directory contains an file named index (e.g. index.ts, index.js), files outside of the directory can no longer import other files in the directory except the index. Only import statements are checked at this moment.',
@@ -12,7 +13,7 @@ export class OnlyImportFromIndexRule extends Rules.TypedRule {
         typescriptOnly: false,
     }
 
-    applyWithProgram(sourceFile: ts.SourceFile, program: ts.Program): RuleFailure[] {
+    applyWithProgram(sourceFile: ts.SourceFile, program: ts.Program): tslint.RuleFailure[] {
         const walker = new Walker(sourceFile, this.getOptions(), program)
         return this.applyWithWalker(walker)
     }
@@ -22,7 +23,7 @@ export const Rule = OnlyImportFromIndexRule // For naming conversion
 
 type Path = string
 
-class Walker extends ProgramAwareRuleWalker {
+class Walker extends tslint.ProgramAwareRuleWalker {
     protected visitSourceFile(node: ts.SourceFile): void {
         node.statements
             .filter(statement => ts.isImportDeclaration(statement))
@@ -43,22 +44,31 @@ class Walker extends ProgramAwareRuleWalker {
         const fromPath = path.normalize(node.parent.fileName)
         const moduleLiteral = node.moduleSpecifier.text
 
-        const potentialIndexedPath = this.getIndexedPath(moduleLiteral, fromPath)
+        const indexedAncestor = this.getIndexedPath(moduleLiteral, fromPath)
 
-        if (potentialIndexedPath) {
-            this.addFailureAtNode(node, errorMessage(potentialIndexedPath))
+        if (existing(indexedAncestor)) {
+            const fix = assume(node.moduleSpecifier, specifier => {
+                const start = specifier.getFullStart()
+                const width = specifier.getFullWidth()
+                return new tslint.Replacement(start, width, indexedAncestor)
+            })
+            this.addFailureAtNode(
+                node,
+                errorMessage(indexedAncestor),
+                fix,
+            )
         }
     }
 
-    private getIndexedPath(moduleLiteral: string, fromPath: Path): Path | null {
+    private getIndexedPath(moduleSpecifierText: string, fromPath: Path): Maybe<Path> {
         const compiler = this.getProgram()
         const compilerOptions = compiler.getCompilerOptions()
         const baseDIR = path.normalize(compiler.getCurrentDirectory()) // fixme
 
-        if (!moduleLiteral.startsWith('.')) {
+        if (!moduleSpecifierText.startsWith('.')) {
             return null
         }
-        const moduleResolved = ts.resolveModuleName(moduleLiteral, fromPath, compilerOptions, ts.sys)
+        const moduleResolved = ts.resolveModuleName(moduleSpecifierText, fromPath, compilerOptions, ts.sys)
         if (!moduleResolved || !moduleResolved.resolvedModule) {
             return null
         }
@@ -72,10 +82,10 @@ class Walker extends ProgramAwareRuleWalker {
             }
             const relativePath = path.relative(path.dirname(fromPath), targetAncestor)
             const prefix = relativePath.startsWith('.') ? '' : './'
-            const potentialIndexedImportLiteral = `${prefix}${relativePath}` // TODO
+            const potentialIndexedImport = `${prefix}${relativePath}` // TODO
             let hasIndex = this.hasIndex.get(targetAncestor)
-            if (hasIndex === undefined) {
-                const resolvedIndex = ts.resolveModuleName(potentialIndexedImportLiteral, fromPath, compilerOptions, ts.sys)
+            if (notExisting(hasIndex)) {
+                const resolvedIndex = ts.resolveModuleName(potentialIndexedImport, fromPath, compilerOptions, ts.sys)
                 if (resolvedIndex && resolvedIndex.resolvedModule) {
                     this.indexAtPath.set(targetAncestor, path.normalize(resolvedIndex.resolvedModule.resolvedFileName))
                     this.hasIndex.set(targetAncestor, true)
@@ -86,7 +96,7 @@ class Walker extends ProgramAwareRuleWalker {
             }
             const notImportingFromIndex = targetPath !== this.indexAtPath.get(targetAncestor)
             if (hasIndex && notImportingFromIndex) {
-                return potentialIndexedImportLiteral
+                return potentialIndexedImport
             }
         }
 
