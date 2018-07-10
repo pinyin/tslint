@@ -40,18 +40,27 @@ class Walker extends ProgramAwareRuleWalker {
             return
         }
 
+        const fromPath = path.normalize(node.parent.fileName)
+        const moduleLiteral = node.moduleSpecifier.text
+
+        const potentialIndexedPath = this.getIndexedPath(moduleLiteral, fromPath)
+
+        if (potentialIndexedPath) {
+            this.addFailureAtNode(node, errorMessage(potentialIndexedPath))
+        }
+    }
+
+    private getIndexedPath(moduleLiteral: string, fromPath: Path): Path | null {
         const compiler = this.getProgram()
         const compilerOptions = compiler.getCompilerOptions()
         const baseDIR = path.normalize(compiler.getCurrentDirectory()) // fixme
 
-        const fromPath = path.normalize(node.parent.fileName)
-        const moduleLiteral = node.moduleSpecifier.text
         if (!moduleLiteral.startsWith('.')) {
-            return
+            return null
         }
         const moduleResolved = ts.resolveModuleName(moduleLiteral, fromPath, compilerOptions, ts.sys)
         if (!moduleResolved || !moduleResolved.resolvedModule) {
-            return
+            return null
         }
         const targetPath = path.normalize(moduleResolved.resolvedModule.resolvedFileName)
 
@@ -63,23 +72,25 @@ class Walker extends ProgramAwareRuleWalker {
             }
             const relativePath = path.relative(path.dirname(fromPath), targetAncestor)
             const prefix = relativePath.startsWith('.') ? '' : './'
-            const potentialIndexedPath = `${prefix}${relativePath}` // TODO
-            if (this.hasIndex.get(targetAncestor) === undefined) {
-                const resolvedIndex = ts.resolveModuleName(potentialIndexedPath, fromPath, compilerOptions, ts.sys)
+            const potentialIndexedImportLiteral = `${prefix}${relativePath}` // TODO
+            let hasIndex = this.hasIndex.get(targetAncestor)
+            if (hasIndex === undefined) {
+                const resolvedIndex = ts.resolveModuleName(potentialIndexedImportLiteral, fromPath, compilerOptions, ts.sys)
                 if (resolvedIndex && resolvedIndex.resolvedModule) {
                     this.indexAtPath.set(targetAncestor, path.normalize(resolvedIndex.resolvedModule.resolvedFileName))
                     this.hasIndex.set(targetAncestor, true)
+                    hasIndex = true
                 } else {
                     this.hasIndex.set(targetAncestor, false)
                 }
             }
             const notImportingFromIndex = targetPath !== this.indexAtPath.get(targetAncestor)
-            if (this.hasIndex.get(targetAncestor) && notImportingFromIndex) {
-                this.addFailureAtNode(node, errorMessage(potentialIndexedPath))
-                // TODO add fix
-                break
+            if (hasIndex && notImportingFromIndex) {
+                return potentialIndexedImportLiteral
             }
         }
+
+        return null
     }
 }
 
