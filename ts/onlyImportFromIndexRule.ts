@@ -23,48 +23,23 @@ export const Rule = OnlyImportFromIndexRule // For naming conversion
 
 type Path = string
 
+type TargetNode = ts.ImportDeclaration | ts.ExportDeclaration
+
+function isTargetNode(node: ts.Node): node is TargetNode {
+    return ts.isImportDeclaration(node) || ts.isExportDeclaration(node)
+}
+
 class Walker extends tslint.ProgramAwareRuleWalker {
     protected visitSourceFile(node: ts.SourceFile): void {
         node.statements
-            .filter(statement => ts.isImportDeclaration(statement))
-            .forEach(statement => this.visitImportDeclaration(statement as ts.ImportDeclaration))
-
-        node.statements
-            .filter(statement => ts.isExportDeclaration(statement))
-            .forEach(statement => this.visitExportDeclaration(statement as ts.ExportDeclaration))
+            .filter(isTargetNode)
+            .forEach(statement => this.visitTargetNode(statement as TargetNode))
     }
 
     private hasIndex = new Map<Path, boolean>()
     private indexAtPath = new Map<Path, Path>()
 
-    protected visitImportDeclaration(node: ts.ImportDeclaration): void {
-        if (!ts.isStringLiteral(node.moduleSpecifier)) {
-            return
-        }
-        if (!node.parent || !ts.isSourceFile(node.parent)) {
-            return
-        }
-        const fromPath = path.normalize(node.parent.fileName)
-        const moduleLiteral = node.moduleSpecifier.text
-        const indexedAncestor = this.getIndexedPath(moduleLiteral, fromPath)
-
-        if (notExisting(indexedAncestor)) {
-            return
-        }
-
-        const fix = assume(node.moduleSpecifier, specifier => {
-            const start = specifier.getFullStart()
-            const width = specifier.getFullWidth()
-            return new tslint.Replacement(start, width, indexedAncestor)
-        })
-        this.addFailureAtNode(
-            node,
-            errorMessage(indexedAncestor),
-            fix,
-        )
-    }
-
-    protected visitExportDeclaration(node: ts.ExportDeclaration): void { // why TSLint doesn't have this method
+    protected visitTargetNode(node: TargetNode): void {
         if (notExisting(node.moduleSpecifier) || !ts.isStringLiteral(node.moduleSpecifier)) {
             return
         }
